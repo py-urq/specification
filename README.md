@@ -1,4 +1,15 @@
-# specification
+# Quick guide to py-urq dialect of URQ language
+
+## Comments 
+
+URQ use C-style comments
+
+```
+/*
+  This is comment
+*/
+```
+
 
 ## Text output
 
@@ -22,9 +33,10 @@ println This text will be on separate line.
 `pln` is alias for `println`.
 Commands `println Some text` and `pln Some text` are equivalent.
 
+
 ## Labels
 
-Labels is used to describe location or procedures.
+Labels describes location or procedures.
 
 ```
 :label
@@ -34,9 +46,11 @@ Labels is used to describe location or procedures.
 end
 ```
 
+
 ## End operator
 
-`end` operator marks label end and pass control to player.
+`end` operator marks label end and pass control to player or return `proc` call to call point.
+
 
 ## Common label
 
@@ -44,6 +58,7 @@ end
 
 You can redefine common name via `common` system variable.
 If `common` variable is set label `common_{value}` will be called on each `goto` and `btn` call.
+
 
 ## Links
 
@@ -84,6 +99,15 @@ btn operator1 & operator2 & ..., Button text
 
 button will call operators and has text "Button text"
 
+
+## Goto
+
+```
+goto label_name
+```
+Immediatly go to label `label_name`.
+
+
 ## User input
 
 ```
@@ -114,7 +138,11 @@ proc label
 
 will go to label, execute operators until `end` and then return to the operator after `proc` call.
 
-forget_proc (?)
+```
+forget_proc
+```
+
+Do not return to call point when reach procedure end.
 
 
 ## Variables
@@ -131,33 +159,20 @@ Variable substitution
 pln I have #apples$ apples.
 ```
 
+
 ## Special characters
 
 ```
 ##{code}$ 
 ```
 
-## Sound
+Substitute ASCII character by code
 
-Play music file once
-
-```
-play "file_name"
-```
-
-## Comments 
-
-URQ use C-style comments
-
-```
-/*
-  This is comment
-*/
-```
 
 ## Inventory
 
 Inventory is a list of variables available for player.
+Each inventory variable starts with `inv_` prefix
 
 
 Add items to inventory:
@@ -201,14 +216,89 @@ invkill
 will delete all inventory.
 
 
+## & operator
+
+```
+expression1 & expression2
+```
+
+Will run expression1 then expression2
+
+Example:
+
+```
+if inv_gold > 10 then inv- 10, gold & goto some_location
+```
+
+
 ## Conditional 
 
-if condition then operators_true else operators_false
+```
+if <condition> then <operators_true> [else <operators_false>]
+```
 
-Goto
+Conditional execution. `else` block is optional
 
-goto label - go to label
 
+## Actions
+
+quit - termination of quest
+
+save - save game state to slot
+
+
+## Math operations
+
+```
+(a + b) * c
+```
+
+Brackets works as usual.
+
+```
+not
+```
+
+Negation for boolean expression.
+
+```
+*, /, +, -,
+```
+
+Arithmetic operations.
+
+```
+<, <=, >, >=,
+```
+
+Compare operations, works as usual.
+
+```
+= 
+```
+
+equals
+
+```
+== 
+```
+
+String mask compare. Mask can contain `*` - for any count of any characters (even zero) and `?` - for exactly one character.
+
+```
+!=, <>
+```
+not equals operators
+
+```
+&&, and
+```
+boolean and
+
+```
+||, or
+```
+boolean or
 
 ## Random number generation
 
@@ -224,6 +314,25 @@ rndX
 
 will return integer value in interval 1 - X (inclusive)
 
+## Time operator
+
+```
+time
+```
+
+will return seconds from midnight. 
+
+Can be used to set time restrictions on locations.
+Though it is a very questionable game design.
+
+Example
+```
+loc:
+if first_time = 0 then first_time = time
+if time - first_time >= 600 then p This message will not be shown until 10 minutes passed since first location visit
+p This is regular message
+end
+```
 
 ## Pause
 
@@ -235,28 +344,13 @@ will pause game for `ms_count` milliseconds.
 It can be used to simulate waiting but it is strongly recommended not to use values greater than 5 000 milliseconds.
 
 
+## Sound
 
-quit - termination of quest
+Play music file once
 
-save - save game state to slot
-
-
-MAth operations
-
-() 
-
-not
-
-*, /, +, -,
-
-<, <=, >, >=,
-= equals
-== string equlas with mask  * and ? glob
-
-!=, <> - not equals
-&& and - and
-|| or - or
-
+```
+play "file_name"
+```
 
 ## Sysytem varianbles
 
@@ -276,10 +370,12 @@ music = "realtive/path/to/file.mp3"
 
 will play file as background music.
 
-
+### common
+```
 common
+```
 
-called on each goto operations
+will redefine common label. See common section.
 
 ### current_loc
 
@@ -309,8 +405,10 @@ set textcolor in hex format.
 
 set background color in hex foramt.
 
-image - show image
+### image
 
+```
+image = 'path/to/image'
+```
 
-
-time - return seconds from midnight
+questionable functionality. Should be only operator.
